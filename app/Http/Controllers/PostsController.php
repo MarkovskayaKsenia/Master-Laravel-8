@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePost;
 use App\Models\BlogPost;
-use Illuminate\Http\Request;
+
 
 class PostsController extends Controller
 {
@@ -15,7 +15,9 @@ class PostsController extends Controller
      */
     public function index()
     {
-        return view('posts.index', ['posts' => BlogPost::all()]);
+        return view('posts.index', [
+            'posts' => BlogPost::withCount('comments')->get()
+        ]);
     }
 
     /**
