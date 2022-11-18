@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePost;
 use App\Models\BlogPost;
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 
 
@@ -16,18 +17,31 @@ class PostsController extends Controller
         $this->middleware('auth')
             ->only(['create', 'store', 'edit', 'update', 'destroy']);
     }
-     /**
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
      */
     public function index()
     {
+        $mostCommented = Cache::remember('blog-post-commented', 3600, function () {
+            return BlogPost::mostCommented()->take(5)->get();
+        });
+
+        $mostActive = Cache::remember('users-most-active', 3600, function () {
+            return User::withMostBlogPosts()->take(5)->get();
+        });
+
+        $mostActiveLastMonth = Cache::remember('users-most-active-last-month', 3600, function () {
+            return User::withMostBlogPostsLastMonth()->take(5)->get();
+        });
+
         return view('posts.index', [
-            'posts' => BlogPost::latest()->withCount('comments')->get(),
-            'mostCommented' => BlogPost::mostCommented()->take(5)->get(),
-            'mostActive' => User::withMostBlogPosts()->take(5)->get(),
-            'mostActiveLastMonth' => User::withMostBlogPostsLastMonth()->take(5)->get(),
+            'posts' => BlogPost::latest()->withCount('comments')->with('user')->get(),
+            'mostCommented' => $mostCommented,
+            'mostActive' => $mostActive,
+            'mostActiveLastMonth' => $mostActiveLastMonth,
         ]);
     }
 
@@ -38,7 +52,7 @@ class PostsController extends Controller
      */
     public function create()
     {
-       // $this->authorize('posts.create');
+        // $this->authorize('posts.create');
         return view('posts.create');
     }
 
@@ -73,8 +87,46 @@ class PostsController extends Controller
             }])->findOrFail($id)
         ]);*/
 
+        $blogPost = Cache::remember("blog-post-{$id}", 600, function () use ($id) {
+            return BlogPost::with('comments')->findOrFail($id);
+        });
+
+        $sessionId = session()->getId();
+        $counterKey = "blog-post-{$id}-counter";
+        $usersKey = "blog-post-{$id}-users";
+
+        $users = Cache::get($usersKey, []);
+        $usersUpdate = [];
+        $difference = 0;
+        $now = now();
+
+        foreach ($users as $session => $lastVisit) {
+            if ($now->diffInMinutes($lastVisit) >= 1) {
+                $difference--;
+            } else {
+                $usersUpdate[$session] = $lastVisit;
+            }
+        }
+
+        if (!array_key_exists($sessionId, $users) || $now->diffInMinutes($users[$sessionId]) >= 1) {
+            $difference++;
+        }
+
+        $usersUpdate[$sessionId] = $now;
+
+        Cache::forever($usersKey, $usersUpdate);
+
+        if (!Cache::has($counterKey)) {
+            Cache::forever($counterKey, 1);
+        } else {
+            Cache::increment($counterKey, $difference);
+        }
+
+        $counter = Cache::get($counterKey);
+
         return view('posts.show', [
-            'post' => BlogPost::with('comments')->findOrFail($id)
+            'post' => $blogPost,
+            'counter' => $counter,
         ]);
     }
 
@@ -89,9 +141,9 @@ class PostsController extends Controller
         $post = BlogPost::findOrFail($id);
         $this->authorize($post);
 
-       /* if (Gate::denies('update-post', $post)) {
-            abort(403, "You can't edit this blog post!");
-        }*/
+        /* if (Gate::denies('update-post', $post)) {
+             abort(403, "You can't edit this blog post!");
+         }*/
 
         return view('posts.edit', ['post' => $post]);
     }

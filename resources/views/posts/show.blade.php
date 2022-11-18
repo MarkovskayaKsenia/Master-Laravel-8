@@ -22,6 +22,8 @@
         Updated
     </x-updated>
 
+    <p>Currently read by {{ $counter }} people</p>
+
     <h4>Comments</h4>
     @forelse($post->comments as $comment)
         <p>
