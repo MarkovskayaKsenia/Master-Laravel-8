@@ -8,9 +8,6 @@
             <h1>
                 {{ $post->title }}
 
-                {{--@component('components.badge', ['type' => 'primary'])
-                    Brand new Post!
-                @endcomponent--}}
                 <x-badge type="primary" :show="now()->diffInMinutes($post->created_at) < 20">
                     Brand new Post!
                 </x-badge>
@@ -28,11 +25,13 @@
             <p>Currently read by {{ $counter }} people</p>
 
             <h4>Comments</h4>
+            @include('comments._form')
+
             @forelse($post->comments as $comment)
                 <p>
                     {{ $comment->content }}
                 </p>
-                <x-updated :date="$comment->created_at">
+                <x-updated :date="$comment->created_at" :name="$comment->user->name">
                 </x-updated>
             @empty
                 <p>Not comments yet!</p>

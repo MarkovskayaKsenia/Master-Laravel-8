@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PostCommentController;
 use App\Http\Controllers\PostsController;
 use App\Http\Controllers\PostTagController;
 use Illuminate\Support\Facades\Auth;
@@ -48,8 +49,9 @@ $posts = [
     ]
 ];
 
-Route::resource('/posts', PostsController::class);
+Route::resource('posts', PostsController::class);
 Route::get('/posts/tag/{tag}', [PostTagController::class, 'index'])->name('posts.tag.index');
+Route::resource('posts.comments', PostCommentController::class)->only(['store']);
 
 Route::get('/recent-posts/{days_ago?}', function ($daysAgo = 20) {
     return 'Posts from ' . $daysAgo . ' days ago';
