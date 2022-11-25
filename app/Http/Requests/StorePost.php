@@ -25,7 +25,16 @@ class StorePost extends FormRequest
     {
         return [
             'title' => 'bail|required|min:5|max:100',
-            'content' => 'required|min:10'
+            'content' => 'required|min:10',
+            'thumbnail' => 'image|mimes:jpeg,jpg,png,gif,svg|max:1024|dimensions:min_height=500',
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'thumbnail.dimensions' => 'Минимальная высота изображения должна быть :min_height px',
+        ];
+    }
+
 }
