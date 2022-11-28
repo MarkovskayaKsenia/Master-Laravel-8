@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostCommentController;
 use App\Http\Controllers\PostsController;
 use App\Http\Controllers\PostTagController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -52,8 +53,9 @@ $posts = [
 Route::resource('posts', PostsController::class);
 Route::get('/posts/tag/{tag}', [PostTagController::class, 'index'])->name('posts.tag.index');
 Route::resource('posts.comments', PostCommentController::class)->only(['store']);
+Route::resource('users', UserController::class)->only(['show', 'edit', 'update']);
 
-Route::get('/recent-posts/{days_ago?}', function ($daysAgo = 20) {
+/*Route::get('/recent-posts/{days_ago?}', function ($daysAgo = 20) {
     return 'Posts from ' . $daysAgo . ' days ago';
 })->name('posts.recent.index')->middleware('auth');
 
@@ -92,4 +94,4 @@ Route::prefix('/fun')->name('fun.')->group(function () use ($posts) {
     Route::get('download', function () use ($posts) {
         return response()->download(public_path('/Голубика-референс.jpg'), 'blueberry.jpg');
     })->name('download');
-});
+});*/

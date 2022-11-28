@@ -12182,3 +12182,8 @@ fieldset:disabled .btn {
   font-size: 1rem;
 }
 
+.avatar {
+  width: 128px;
+  height: 128px;
+}
+
