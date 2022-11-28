@@ -5,6 +5,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PostCommentController;
 use App\Http\Controllers\PostsController;
 use App\Http\Controllers\PostTagController;
+use App\Http\Controllers\UserCommentController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -31,7 +32,7 @@ Auth::routes();
 
 Route::get('/single', AboutController::class);
 
-$posts = [
+/*$posts = [
     1 => [
         'title' => 'Intro to Laravel',
         'content' => 'This is a short intro to Laravel',
@@ -48,12 +49,14 @@ $posts = [
         'content' => 'This is a short intro to Golang',
         'is_new' => false
     ]
-];
+];*/
 
 Route::resource('posts', PostsController::class);
 Route::get('/posts/tag/{tag}', [PostTagController::class, 'index'])->name('posts.tag.index');
 Route::resource('posts.comments', PostCommentController::class)->only(['store']);
+Route::resource('users.comments', UserCommentController::class)->only(['store']);
 Route::resource('users', UserController::class)->only(['show', 'edit', 'update']);
+
 
 /*Route::get('/recent-posts/{days_ago?}', function ($daysAgo = 20) {
     return 'Posts from ' . $daysAgo . ' days ago';
