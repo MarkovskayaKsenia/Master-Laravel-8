@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Scopes\DeletedAdminScope;
+use App\Traits\Taggable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +16,7 @@ class BlogPost extends Model
 
     use HasFactory;
     use SoftDeletes;
+    use Taggable;
 
     public function comments()
     {
@@ -24,11 +26,6 @@ class BlogPost extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function tags()
-    {
-        return $this->belongsToMany(Tag::class)->withTimestamps();
     }
 
     public function image()
