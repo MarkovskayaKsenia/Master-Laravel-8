@@ -36,7 +36,6 @@ class NotifyUsersPostWasCommented implements ShouldQueue
      */
     public function handle()
     {
-
         User::thatHasCommentedOnPost($this->comment->commentable)
             ->get()
             ->filter(function (User $user) {
