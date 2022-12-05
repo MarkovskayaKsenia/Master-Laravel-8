@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Scopes\LatestScope;
 use App\Traits\Taggable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -30,5 +31,11 @@ class Comment extends Model
     public function scopeLatest(Builder $query)
     {
         return $query->orderBy(static::CREATED_AT, 'desc');
+    }
+
+    public static function boot()
+    {
+        static::addGlobalScope(new LatestScope());
+        parent::boot();
     }
 }
