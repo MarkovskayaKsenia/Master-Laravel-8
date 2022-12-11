@@ -76,8 +76,8 @@ class PostTest extends TestCase
 
         $messages = session('errors')->getMessages();
 
-        $this->assertEquals($messages['title'][0], 'The title must be at least 5 characters.');
-        $this->assertEquals($messages['content'][0], 'The content must be at least 10 characters.');
+        $this->assertEquals('The title must be at least 5 characters.', $messages['title'][0]);
+        $this->assertEquals('The content must be at least 10 characters.', $messages['content'][0]);
     }
 
     public function test_update_valid()
@@ -100,7 +100,7 @@ class PostTest extends TestCase
             ->assertStatus(302)
             ->assertSessionHas('status');
 
-        $this->assertEquals(session('status'), 'Blog post was updated');
+        $this->assertEquals('Blog post was updated', session('status'));
         $this->assertDatabaseMissing('blog_posts', $post->toArray());
     }
 
@@ -114,7 +114,7 @@ class PostTest extends TestCase
             ->assertStatus(302)
             ->assertSessionHas('status');
 
-        $this->assertEquals(session('status'), 'Blog post was deleted!');
+        $this->assertEquals('Blog post was deleted!', session('status'));
        // $this->assertDatabaseMissing('blog_posts', ['id' => $post->id]);
         $this->assertSoftDeleted('blog_posts', ['id' => $post->id]);
 
